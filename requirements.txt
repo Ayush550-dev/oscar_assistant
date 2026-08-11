@@ -1,15 +1,13 @@
-# Stage 1 requirements - wake word + local speech-to-text
-# Install with: pip install -r requirements.txt
 
-openwakeword==0.6.0      # local wake word detection ("Hey Jarvis" built-in model to start)
-sounddevice==0.4.7       # microphone audio capture
-numpy==1.26.4            # audio array handling
-faster-whisper==1.0.3    # local speech-to-text (runs on CPU)
-scipy==1.13.1            # audio helper functions
-google-genai             # Gemini API - free "brain" for smart replies
-edge-tts                 # free local text-to-speech (neural voices, no signup)
-pygame                   # plays the generated speech audio
-PyQt6                    # desktop GUI window
-psutil                   # CPU/RAM stats for the telemetry panel
+openwakeword==0.6.0   
+sounddevice==0.4.7    
+numpy==1.26.4         
+faster-whisper==1.0.3   
+scipy==1.13.1        
+google-genai           
+edge-tts            
+pygame                 
+PyQt6               
+psutil                
 
 
