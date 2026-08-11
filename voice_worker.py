@@ -1,12 +1,3 @@
-"""
-voice_worker.py - runs the continuous wake-word -> listen -> think -> speak
-loop on a background thread, so it never freezes the GUI window.
-
-It emits Qt "signals" whenever something happens (state changes, you said
-something, OSCAR replied) - the main window listens for these and updates
-the display safely.
-"""
-
 from PyQt6.QtCore import QThread, pyqtSignal
 import numpy as np
 import sounddevice as sd
@@ -25,10 +16,9 @@ WHISPER_MODEL_SIZE = "tiny"
 
 
 class VoiceWorker(QThread):
-    # Qt signals - these are how this background thread safely talks to the GUI
-    state_changed = pyqtSignal(str)   # "idle" | "listening" | "thinking" | "speaking" | "loading"
-    heard_text = pyqtSignal(str)      # what you said
-    oscar_reply = pyqtSignal(str)     # what OSCAR said back
+    state_changed = pyqtSignal(str)
+    heard_text = pyqtSignal(str)    
+    oscar_reply = pyqtSignal(str) 
 
     def __init__(self):
         super().__init__()
