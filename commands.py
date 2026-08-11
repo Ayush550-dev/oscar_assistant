@@ -1,15 +1,4 @@
-"""
-commands.py - local, rule-based app control (no AI, no internet needed)
 
-This looks for known app names inside whatever you said, and opens/closes
-them using Windows itself. Add more apps to APP_MAP as you need them.
-"""
-
-import subprocess
-
-# Map what you might SAY to the actual Windows process (.exe) name.
-# The key is what you'll say (lowercase), the value is the real .exe Windows
-# uses for that program. Add more entries here as you use more apps.
 APP_MAP = {
     "chrome": "chrome.exe",
     "google chrome": "chrome.exe",
@@ -27,17 +16,12 @@ APP_MAP = {
     "task manager": "taskmgr.exe",
 }
 
-
-# Some apps are launched with one name but actually run under a DIFFERENT
-# process name internally (common with modern Windows built-in apps).
-# If closing fails with the main name, we try these alternates too.
 CLOSE_NAME_OVERRIDES = {
     "calc.exe": ["CalculatorApp.exe", "Calculator.exe", "calc.exe"],
 }
 
 
 def open_app(exe_name):
-    """Launches an app the same way Windows' Run box would."""
     try:
         subprocess.Popen(["start", "", exe_name], shell=True)
         return True
@@ -47,7 +31,6 @@ def open_app(exe_name):
 
 
 def close_app(exe_name):
-    """Force-closes an app by its process name, trying known alternates."""
     candidates = CLOSE_NAME_OVERRIDES.get(exe_name, [exe_name])
     for candidate in candidates:
         try:
@@ -61,7 +44,6 @@ def close_app(exe_name):
 
 
 def find_app_in_text(text):
-    """Looks for any known app name inside the spoken text."""
     text_lower = text.lower()
     for alias, exe in APP_MAP.items():
         if alias in text_lower:
@@ -70,9 +52,6 @@ def find_app_in_text(text):
 
 
 def handle_command(text):
-    """
-    Very simple rule-based command handler.
-    Looks for phrases like 'open chrome' or 'close spotify'.
 
     Returns:
         A short response string if it handled the command,
