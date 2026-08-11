@@ -1,17 +1,3 @@
-"""
-gui_app.py - O.S.C.A.R.'s desktop window (replaces running things in the console)
-
-Run this instead of main.py once you're ready to use the real interface:
-    python gui_app.py
-
-Key design choices for keeping CPU usage low (unlike the old version):
-- The holographic ring only animates quickly while actively listening/speaking.
-  While idle, it barely redraws at all (1 frame per second).
-- System telemetry (CPU/RAM) is polled once every 2 seconds, not continuously.
-- The mic/voice pipeline runs on a separate background thread (voice_worker.py)
-  so it never blocks or slows down the window itself.
-"""
-
 import os
 import sys
 import threading
@@ -98,7 +84,6 @@ QPushButton:hover {
 
 
 class HoloRing(QWidget):
-    """The circular holographic display in the center of the window."""
 
     STATE_COLORS = {
         "loading":  QColor(150, 150, 150, 160),
@@ -114,8 +99,6 @@ class HoloRing(QWidget):
         self.state = "loading"
         self.logo_pixmap = QPixmap(LOGO_PATH) if os.path.exists(LOGO_PATH) else None
 
-        # Idle = redraw once a second only (near-zero CPU).
-        # Active states speed this up for a smooth animation.
         self.timer = QTimer(self)
         self.timer.timeout.connect(self._tick)
         self.timer.start(1000)
@@ -138,12 +121,10 @@ class HoloRing(QWidget):
         radius = min(w, h) / 2 - 24
         glow = self.STATE_COLORS.get(self.state, self.STATE_COLORS["idle"])
 
-        # Concentric rings
         for r in (radius, radius * 0.82, radius * 0.64):
             painter.setPen(QPen(glow, 1.5))
             painter.drawEllipse(QPointF(cx, cy), r, r)
 
-        # Rotating tick marks around the outer ring
         painter.save()
         painter.translate(cx, cy)
         painter.rotate(self.angle)
@@ -155,7 +136,6 @@ class HoloRing(QWidget):
             painter.restore()
         painter.restore()
 
-        # Center: your logo file, or a placeholder reminder if not found yet
         if self.logo_pixmap and not self.logo_pixmap.isNull():
             size = int(radius * 0.85)
             target = QRectF(cx - size / 2, cy - size / 2, size, size)
@@ -170,7 +150,6 @@ class HoloRing(QWidget):
 
 
 class TypedCommandWorker(QThread):
-    """Handles commands typed into the console box without freezing the GUI."""
     result_ready = pyqtSignal(str)
 
     def __init__(self, text):
@@ -197,7 +176,6 @@ class MainWindow(QMainWindow):
         main_layout.setContentsMargins(20, 20, 20, 20)
         main_layout.setSpacing(20)
 
-        # ---- Left side: the holographic ring ----
         left_layout = QVBoxLayout()
         title = QLabel("O.S.C.A.R.")
         title.setStyleSheet("font-size: 26px; font-weight: bold; color: #00d9ff;")
@@ -210,7 +188,6 @@ class MainWindow(QMainWindow):
         left_layout.addWidget(self.holo, stretch=1)
         main_layout.addLayout(left_layout, stretch=2)
 
-        # ---- Right side: status, telemetry, console ----
         right_layout = QVBoxLayout()
         main_layout.addLayout(right_layout, stretch=1)
 
@@ -248,13 +225,11 @@ class MainWindow(QMainWindow):
         self.run_btn.clicked.connect(self.on_run_clicked)
         self.input_line.returnPressed.connect(self.on_run_clicked)
 
-        # ---- Telemetry polling: every 2 seconds, NOT continuously ----
         self.telemetry_timer = QTimer(self)
         self.telemetry_timer.timeout.connect(self.update_telemetry)
         self.telemetry_timer.start(2000)
         self.update_telemetry()
 
-        # ---- Background voice loop ----
         self.worker = VoiceWorker()
         self.worker.state_changed.connect(self.on_state_changed)
         self.worker.heard_text.connect(self.on_heard_text)
