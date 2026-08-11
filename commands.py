@@ -57,12 +57,11 @@ def handle_command(text):
         A short response string if it handled the command,
         or None if it didn't recognize anything (so Stage 2's
         cloud brain can take over and try to answer instead).
-    """
     text_lower = text.lower()
     alias, exe = find_app_in_text(text)
 
     if alias is None:
-        return None  # no known app mentioned
+        return None
 
     if any(word in text_lower for word in ["open", "launch", "start"]):
         if open_app(exe):
